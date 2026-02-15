@@ -5,6 +5,7 @@ import { isUserAdmin, requirePageUser } from "@/lib/auth";
 import { DEFAULT_AVATAR_PATH } from "@/lib/constants";
 import { formatSydneyDateTime } from "@/lib/date-time";
 import { AppShell } from "@/components/app-shell";
+import { ConversationAutoScroll } from "@/components/conversation-auto-scroll";
 import { ConversationTitleEditor } from "@/components/conversation-title-editor";
 import { MessageComposer } from "@/components/message-composer";
 import { ConversationParticipantsPanel } from "@/components/conversation-participants-panel";
@@ -155,6 +156,7 @@ export default async function ConversationPage({ params }: Props) {
         {!adminView && !isParticipant ? (
           <p className="text-sm text-slate-400">Only participants can post in this conversation.</p>
         ) : null}
+        <ConversationAutoScroll conversationId={conversation.id} messageCount={conversation.messages.length} />
       </main>
     </AppShell>
   );
