@@ -167,13 +167,14 @@ export default async function AppDashboardPage() {
               {latestConversations.map((conversation) => {
                 const participantNames = conversation.participants.map((participant) => participant.user.displayName).join(", ");
                 const latestMessage = conversation.messages[0];
+                const latestActivityAt = latestMessage?.createdAt ?? conversation.createdAt;
 
                 return (
                   <li key={conversation.id}>
                     <Link href={`/app/conversations/${conversation.id}`} className="fantasy-link-card block rounded-2xl p-3.5">
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-sm font-semibold text-slate-100">{conversation.title ?? "Untitled conversation"}</p>
-                        <span className="text-xs text-slate-400">{new Date(conversation.createdAt).toLocaleString()}</span>
+                        <span className="text-xs text-slate-400">{new Date(latestActivityAt).toLocaleString()}</span>
                       </div>
                       <p className="mt-1 text-xs text-slate-400">Participants: {participantNames || "None"}</p>
                       {latestMessage ? (
