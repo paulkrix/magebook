@@ -264,9 +264,15 @@ a {
 @media (min-width: 700px) {
   .profile-top {
     grid-template-columns: auto 1fr;
-    align-items: center;
+    align-items: start;
     gap: 2rem;
   }
+}
+
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
 }
 
 .profile-avatar {
@@ -278,17 +284,17 @@ a {
   box-shadow: 0 12px 28px rgba(5, 11, 23, 0.6);
 }
 
-.profile-username {
+.profile-display-name {
   font-family: "Sora", "Segoe UI", sans-serif;
-  font-size: 1.95rem;
+  font-size: 1.45rem;
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1.1;
 }
 
 .profile-handle {
-  color: #d8e5fb;
-  font-size: 1.05rem;
-  font-weight: 700;
+  color: #b8cae8;
+  font-size: 0.98rem;
+  font-weight: 600;
 }
 
 .profile-bio {
@@ -415,8 +421,8 @@ a {
     height: 96px;
   }
 
-  .profile-username {
-    font-size: 1.55rem;
+  .profile-display-name {
+    font-size: 1.25rem;
   }
 
   .profile-grid-item {

@@ -11,6 +11,7 @@ export type SafeUser = {
   username: string;
   email: string | null;
   displayName: string;
+  bio: string | null;
   profileImageUrl: string | null;
   role: UserRole;
 };
@@ -71,6 +72,7 @@ export function toSafeUser(user: User): SafeUser {
     username: user.username,
     email: user.email,
     displayName: user.displayName,
+    bio: user.bio,
     profileImageUrl: user.profileImageUrl,
     role: user.role
   };

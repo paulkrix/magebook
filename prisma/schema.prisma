@@ -17,6 +17,7 @@ model User {
   username              String                    @unique
   email                 String?                   @unique
   displayName           String
+  bio                   String?
   profileImageUrl       String?
   role                  UserRole                  @default(USER)
   createdAt             DateTime                  @default(now())

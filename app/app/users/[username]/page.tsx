@@ -24,9 +24,7 @@ function formatCount(value: number): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
-function buildBio(displayName: string): string {
-  return `${displayName} is part of the Community network. Keeping conversations active and sharing updates with the local circle.`;
-}
+const defaultBio = "Part of the Community network. Keeping conversations active and sharing updates with the local circle.";
 
 export default async function UserProfilePage({ params }: Props) {
   const viewer = await requirePageUser();
@@ -38,6 +36,7 @@ export default async function UserProfilePage({ params }: Props) {
       id: true,
       username: true,
       displayName: true,
+      bio: true,
       profileImageUrl: true
     }
   });
@@ -113,14 +112,16 @@ export default async function UserProfilePage({ params }: Props) {
       <main className="social-profile-wrap space-y-4">
         <section className="social-card p-4 sm:p-6">
           <div className="profile-top">
-            <img src={profile.profileImageUrl ?? DEFAULT_AVATAR_PATH} alt={profile.displayName} className="profile-avatar" />
+            <div className="profile-identity">
+              <img src={profile.profileImageUrl ?? DEFAULT_AVATAR_PATH} alt={profile.displayName} className="profile-avatar" />
+              <div className="min-w-0">
+                <p className="profile-display-name truncate">{profile.displayName}</p>
+                <p className="profile-handle mt-1 truncate">@{profile.username}</p>
+              </div>
+            </div>
 
             <div>
-              <p className="profile-username">{profile.username}</p>
-              <p className="profile-handle mt-1">@{profile.username}</p>
-              <p className="mt-2 text-xl font-semibold text-slate-100">{profile.displayName}</p>
-              <p className="profile-bio mt-2">{buildBio(profile.displayName)}</p>
-
+              <p className="profile-bio">{profile.bio?.trim() || defaultBio}</p>
               <div className="profile-stat-grid">
                 <div className="profile-stat-card">
                   <p className="profile-stat-value">{formatCount(postCount)}</p>

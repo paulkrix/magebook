@@ -5,11 +5,13 @@ import { DEFAULT_AVATAR_PATH } from "@/lib/constants";
 
 type Props = {
   initialDisplayName: string;
+  initialBio: string | null;
   initialImageUrl: string | null;
 };
 
-export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
+export function ProfileForm({ initialDisplayName, initialBio, initialImageUrl }: Props) {
   const [displayName, setDisplayName] = useState(initialDisplayName);
+  const [bio, setBio] = useState(initialBio ?? "");
   const [profileImageUrl, setProfileImageUrl] = useState(initialImageUrl);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -49,7 +51,10 @@ export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
         finalImageUrl = await uploadProfileImage(selectedFile);
       }
 
-      const payloadToUpdate: { displayName: string; profileImageUrl?: string } = { displayName };
+      const payloadToUpdate: { displayName: string; bio: string; profileImageUrl?: string } = {
+        displayName,
+        bio
+      };
       if (finalImageUrl?.startsWith("/uploads/profile-images/")) {
         payloadToUpdate.profileImageUrl = finalImageUrl;
       }
@@ -62,7 +67,7 @@ export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
 
       const payload = (await response.json()) as {
         error?: string;
-        user?: { profileImageUrl: string | null; displayName: string };
+        user?: { profileImageUrl: string | null; displayName: string; bio: string | null };
       };
 
       if (!response.ok || !payload.user) {
@@ -71,6 +76,7 @@ export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
 
       setProfileImageUrl(payload.user.profileImageUrl);
       setDisplayName(payload.user.displayName);
+      setBio(payload.user.bio ?? "");
       setSelectedFile(null);
       setMessage("Profile updated.");
     } catch (requestError) {
@@ -119,6 +125,21 @@ export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
           className="social-input"
           required
         />
+      </div>
+
+      <div>
+        <label htmlFor="bio" className="mb-1.5 block text-sm font-medium text-slate-200">
+          Profile blurb
+        </label>
+        <textarea
+          id="bio"
+          value={bio}
+          onChange={(event) => setBio(event.target.value)}
+          className="social-input min-h-[110px] resize-y"
+          maxLength={280}
+          placeholder="Tell people a little about yourself."
+        />
+        <p className="mt-1 text-xs text-slate-400">{bio.length}/280</p>
       </div>
 
       {error ? <p className="notice-danger">{error}</p> : null}

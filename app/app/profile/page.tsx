@@ -12,12 +12,12 @@ export default async function ProfilePage() {
         <div className="mb-4 space-y-2">
           <p className="fantasy-kicker text-xs font-semibold uppercase tracking-wide">Profile</p>
           <h1 className="text-2xl font-semibold text-slate-100">Edit your profile</h1>
-          <p className="text-sm text-slate-400">Keep your name and photo up to date so conversations feel more personal.</p>
+          <p className="text-sm text-slate-400">Keep your name, blurb, and photo up to date so conversations feel more personal.</p>
           <Link href={`/app/users/${user.username}`} className="fantasy-back-link inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium">
             View public profile
           </Link>
         </div>
-        <ProfileForm initialDisplayName={user.displayName} initialImageUrl={user.profileImageUrl} />
+        <ProfileForm initialDisplayName={user.displayName} initialBio={user.bio} initialImageUrl={user.profileImageUrl} />
       </main>
     </AppShell>
   );

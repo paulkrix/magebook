@@ -31,6 +31,7 @@ export async function PATCH(request: NextRequest) {
       where: { id: auth.user.id },
       data: {
         ...(parsed.data.displayName !== undefined ? { displayName: parsed.data.displayName } : {}),
+        ...(parsed.data.bio !== undefined ? { bio: parsed.data.bio || null } : {}),
         ...(parsed.data.profileImageUrl !== undefined ? { profileImageUrl: parsed.data.profileImageUrl } : {})
       }
     });

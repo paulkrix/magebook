@@ -16,9 +16,10 @@ export const loginSchema = z.object({
 export const profilePatchSchema = z
   .object({
     displayName: z.string().trim().min(1).max(80).optional(),
+    bio: z.string().trim().max(280).optional(),
     profileImageUrl: profileImagePathSchema.optional()
   })
-  .refine((payload) => payload.displayName !== undefined || payload.profileImageUrl !== undefined, {
+  .refine((payload) => payload.displayName !== undefined || payload.bio !== undefined || payload.profileImageUrl !== undefined, {
     message: "At least one profile field must be provided."
   });
 
