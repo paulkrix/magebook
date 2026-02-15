@@ -102,7 +102,7 @@ export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
               setMessage(null);
               setError(null);
             }}
-            className="social-input block cursor-pointer text-sm file:mr-3 file:rounded-full file:border-0 file:bg-[#e8f4ff] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-[#0f84d9]"
+            className="social-input fantasy-file-input block cursor-pointer text-sm"
           />
           <p className="text-xs text-slate-500">JPEG/PNG/WEBP/GIF only. Max size 2 MB.</p>
         </div>

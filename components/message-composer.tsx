@@ -49,7 +49,7 @@ export function MessageComposer({ conversationId }: Props) {
 
   return (
     <form onSubmit={sendMessage} className="social-card space-y-3 p-4 sm:p-5">
-      <label htmlFor="message-body" className="text-sm font-semibold uppercase tracking-wide text-[#0f84d9]">
+      <label htmlFor="message-body" className="fantasy-card-title text-sm font-semibold uppercase tracking-wide">
         New message
       </label>
       <textarea

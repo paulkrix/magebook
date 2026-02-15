@@ -13,12 +13,14 @@ export default async function LoginPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-5xl items-center px-4 py-8 sm:px-6">
       <div className="grid w-full gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <section className="social-card hidden p-10 lg:block">
-          <p className="mb-3 inline-flex rounded-full bg-[#e8f4ff] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#0f84d9]">
-            Community Chat
+          <p className="fantasy-pill mb-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+            Owl Post Network
           </p>
-          <h1 className="mb-4 text-4xl font-bold leading-tight text-slate-900">A cleaner social hub for your local community.</h1>
+          <h1 className="mb-4 text-4xl font-bold leading-tight text-[#2c1f13]">
+            Gather your guild, share whispers, and chronicle every quest.
+          </h1>
           <p className="social-muted max-w-lg text-base">
-            Share updates, start conversations, and personalize your profile with a familiar social-media style experience.
+            A parchment-toned commons for local circles, study groups, and tavern-table strategy.
           </p>
         </section>
 

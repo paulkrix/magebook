@@ -22,29 +22,29 @@ export function AppShell({ user, children }: Props) {
 
   return (
     <div className="min-h-screen pb-8">
-      <header className="sticky top-0 z-20 border-b border-[#dbe6f4] bg-white/75 backdrop-blur-md">
+      <header className="fantasy-topbar sticky top-0 z-20">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3 sm:gap-5">
-            <Link href="/app" className="flex items-center gap-2 text-base font-bold tracking-tight text-slate-900 sm:text-lg">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#e8f4ff] text-sm font-bold text-[#0f84d9]">
+            <Link href="/app" className="flex items-center gap-2 text-base font-bold tracking-tight text-[#f8e8c1] sm:text-lg">
+              <span className="fantasy-crest inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold">
                 C
               </span>
               Community
             </Link>
             <nav className="flex items-center gap-2 text-sm">
-              <Link href="/app" className="rounded-full px-3 py-1.5 font-medium text-slate-700 transition hover:bg-[#f1f7ff] hover:text-slate-900">
+              <Link href="/app" className="fantasy-nav-link px-3 py-1.5 font-medium">
                 Dashboard
               </Link>
               <Link
                 href="/app/profile"
-                className="rounded-full px-3 py-1.5 font-medium text-slate-700 transition hover:bg-[#f1f7ff] hover:text-slate-900"
+                className="fantasy-nav-link px-3 py-1.5 font-medium"
               >
                 Profile
               </Link>
               {canManageUsers ? (
                 <Link
                   href="/app/admin"
-                  className="rounded-full px-3 py-1.5 font-medium text-slate-700 transition hover:bg-[#f1f7ff] hover:text-slate-900"
+                  className="fantasy-nav-link px-3 py-1.5 font-medium"
                 >
                   Admin
                 </Link>
@@ -56,9 +56,9 @@ export function AppShell({ user, children }: Props) {
             <img
               src={user.profileImageUrl ?? DEFAULT_AVATAR_PATH}
               alt={user.displayName}
-              className="h-9 w-9 rounded-full border-2 border-white object-cover shadow-sm"
+              className="h-9 w-9 rounded-full border-2 border-[#f7deb2] object-cover shadow-sm"
             />
-            <span className="hidden text-sm font-medium text-slate-700 sm:inline">{user.displayName}</span>
+            <span className="hidden text-sm font-medium text-[#f6ebcf] sm:inline">{user.displayName}</span>
             <LogoutButton />
           </div>
         </div>

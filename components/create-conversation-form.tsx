@@ -69,7 +69,7 @@ export function CreateConversationForm({ users, currentUserId }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="social-card space-y-4 p-4 sm:p-5">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-[#0f84d9]">Create conversation</h3>
+      <h3 className="fantasy-card-title text-sm font-semibold uppercase tracking-wide">Create conversation</h3>
 
       <div>
         <label htmlFor="conversation-title" className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -86,17 +86,17 @@ export function CreateConversationForm({ users, currentUserId }: Props) {
 
       <fieldset>
         <legend className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">Participants</legend>
-        <div className="max-h-44 space-y-1.5 overflow-auto rounded-xl border border-[#d4e1f1] bg-white p-2.5">
+        <div className="max-h-44 space-y-1.5 overflow-auto rounded-xl border border-[#c2a36e] bg-[#fff6e4]/85 p-2.5">
           {candidateUsers.map((user) => (
             <label
               key={user.id}
-              className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-700 transition hover:bg-[#f3f8ff]"
+              className="fantasy-list-item flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-700"
             >
               <input
                 type="checkbox"
                 checked={selectedUserIds.includes(user.id)}
                 onChange={() => toggleUser(user.id)}
-                className="h-4 w-4 rounded border-slate-300 accent-[#1d9bf0]"
+                className="h-4 w-4 rounded border-slate-300 accent-[#8b2f2b]"
               />
               <span className="font-medium">{user.displayName}</span>
               <span className="text-xs text-slate-500">@{user.username}</span>

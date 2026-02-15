@@ -74,7 +74,7 @@ export default async function ConversationPage({ params }: Props) {
   return (
     <AppShell user={user}>
       <main className="space-y-4">
-        <Link href="/app" className="inline-flex items-center rounded-full bg-white/75 px-3 py-1.5 text-sm font-medium text-[#0f84d9] shadow-sm transition hover:bg-white">
+        <Link href="/app" className="fantasy-back-link inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium shadow-sm transition">
           Back to dashboard
         </Link>
 
@@ -90,13 +90,13 @@ export default async function ConversationPage({ params }: Props) {
         </section>
 
         <section className="social-card p-4 sm:p-5">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#0f84d9]">Messages</h2>
+          <h2 className="fantasy-card-title mb-3 text-sm font-semibold uppercase tracking-wide">Messages</h2>
           <ul className="space-y-3.5">
             {conversation.messages.length === 0 ? (
               <li className="text-sm text-slate-500">No messages yet.</li>
             ) : (
               conversation.messages.map((message) => (
-                <li key={message.id} className="rounded-2xl border border-[#d4e1f1] bg-white p-3">
+                <li key={message.id} className="fantasy-link-card rounded-2xl p-3">
                   <div className="mb-1 flex items-center gap-2">
                     <img
                       src={message.author.profileImageUrl ?? DEFAULT_AVATAR_PATH}
