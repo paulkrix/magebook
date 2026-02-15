@@ -24,12 +24,12 @@ export const profilePatchSchema = z
   });
 
 export const createConversationSchema = z.object({
-  title: z.string().trim().max(120).optional(),
+  title: z.string().trim().min(1).max(120),
   participantIds: z.array(z.string().min(1)).min(1)
 });
 
 export const renameConversationSchema = z.object({
-  title: z.string().trim().max(120)
+  title: z.string().trim().min(1).max(120)
 });
 
 export const createMessageSchema = z.object({

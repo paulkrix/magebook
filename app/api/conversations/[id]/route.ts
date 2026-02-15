@@ -49,7 +49,7 @@ export async function PATCH(request: NextRequest, context: Context) {
     const updated = await prisma.conversation.update({
       where: { id: context.params.id },
       data: {
-        title: parsed.data.title || null
+        title: parsed.data.title
       },
       select: {
         id: true,

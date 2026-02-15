@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     const conversation = await prisma.$transaction(async (tx) => {
       const created = await tx.conversation.create({
         data: {
-          title: parsed.data.title || null,
+          title: parsed.data.title,
           createdById: auth.user.id
         }
       });

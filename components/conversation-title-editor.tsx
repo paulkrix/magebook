@@ -18,13 +18,20 @@ export function ConversationTitleEditor({ conversationId, initialTitle }: Props)
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    const trimmedTitle = title.trim();
+
+    if (!trimmedTitle) {
+      setError("Title is required.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const response = await fetch(`/api/conversations/${conversationId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title })
+        body: JSON.stringify({ title: trimmedTitle })
       });
 
       const payload = (await response.json()) as { error?: string };
@@ -70,6 +77,7 @@ export function ConversationTitleEditor({ conversationId, initialTitle }: Props)
           onChange={(event) => setTitle(event.target.value)}
           className="social-input max-w-md"
           maxLength={120}
+          required
         />
         <button
           type="submit"
