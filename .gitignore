@@ -1,0 +1,43 @@
+# Dependencies
+/node_modules/
+
+# Build outputs
+/.next/
+/out/
+/dist/
+/coverage/
+*.tsbuildinfo
+
+# Environment/secrets (keep template files tracked)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Local runtime/data artifacts
+/data/
+.tmp-cookies.txt
+*.tmp
+*.pid
+*.pid.lock
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.suo
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini

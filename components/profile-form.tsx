@@ -1,0 +1,136 @@
+"use client";
+
+import { useState } from "react";
+import { DEFAULT_AVATAR_PATH } from "@/lib/constants";
+
+type Props = {
+  initialDisplayName: string;
+  initialImageUrl: string | null;
+};
+
+export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
+  const [displayName, setDisplayName] = useState(initialDisplayName);
+  const [profileImageUrl, setProfileImageUrl] = useState(initialImageUrl);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function uploadProfileImage(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.set("file", file);
+
+    const uploadResponse = await fetch("/api/me/profile-image", {
+      method: "POST",
+      body: formData
+    });
+
+    const uploadPayload = (await uploadResponse.json()) as {
+      error?: string;
+      publicUrl?: string;
+    };
+
+    if (!uploadResponse.ok || !uploadPayload.publicUrl) {
+      throw new Error(uploadPayload.error ?? "Profile image upload failed.");
+    }
+
+    return uploadPayload.publicUrl;
+  }
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage(null);
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      let finalImageUrl = profileImageUrl;
+      if (selectedFile) {
+        finalImageUrl = await uploadProfileImage(selectedFile);
+      }
+
+      const payloadToUpdate: { displayName: string; profileImageUrl?: string } = { displayName };
+      if (finalImageUrl?.startsWith("/uploads/profile-images/")) {
+        payloadToUpdate.profileImageUrl = finalImageUrl;
+      }
+
+      const response = await fetch("/api/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadToUpdate)
+      });
+
+      const payload = (await response.json()) as {
+        error?: string;
+        user?: { profileImageUrl: string | null; displayName: string };
+      };
+
+      if (!response.ok || !payload.user) {
+        throw new Error(payload.error ?? "Unable to save profile.");
+      }
+
+      setProfileImageUrl(payload.user.profileImageUrl);
+      setDisplayName(payload.user.displayName);
+      setSelectedFile(null);
+      setMessage("Profile updated.");
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Unknown error.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="social-card space-y-5 p-5 sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <img
+          src={profileImageUrl ?? DEFAULT_AVATAR_PATH}
+          alt="Profile"
+          className="h-20 w-20 rounded-full border-2 border-white object-cover shadow-md"
+        />
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-slate-700" htmlFor="profileImage">
+            Profile image
+          </label>
+          <input
+            id="profileImage"
+            type="file"
+            accept="image/*"
+            onChange={(event) => {
+              const file = event.target.files?.[0] ?? null;
+              setSelectedFile(file);
+              setMessage(null);
+              setError(null);
+            }}
+            className="social-input block cursor-pointer text-sm file:mr-3 file:rounded-full file:border-0 file:bg-[#e8f4ff] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-[#0f84d9]"
+          />
+          <p className="text-xs text-slate-500">JPEG/PNG/WEBP/GIF only. Max size 2 MB.</p>
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="displayName" className="mb-1.5 block text-sm font-medium text-slate-700">
+          Display name
+        </label>
+        <input
+          id="displayName"
+          value={displayName}
+          onChange={(event) => setDisplayName(event.target.value)}
+          className="social-input"
+          required
+        />
+      </div>
+
+      {error ? <p className="rounded-xl bg-red-50 p-2.5 text-sm text-red-700">{error}</p> : null}
+      {message ? <p className="rounded-xl bg-emerald-50 p-2.5 text-sm text-emerald-700">{message}</p> : null}
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="social-button-primary px-4 py-2.5 text-sm"
+      >
+        {isSubmitting ? "Saving..." : "Save profile"}
+      </button>
+    </form>
+  );
+}
