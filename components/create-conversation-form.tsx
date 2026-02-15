@@ -72,7 +72,7 @@ export function CreateConversationForm({ users, currentUserId }: Props) {
       <h3 className="fantasy-card-title text-sm font-semibold uppercase tracking-wide">Create conversation</h3>
 
       <div>
-        <label htmlFor="conversation-title" className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
+        <label htmlFor="conversation-title" className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-400">
           Title (optional)
         </label>
         <input
@@ -85,27 +85,27 @@ export function CreateConversationForm({ users, currentUserId }: Props) {
       </div>
 
       <fieldset>
-        <legend className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">Participants</legend>
-        <div className="max-h-44 space-y-1.5 overflow-auto rounded-xl border border-[#c2a36e] bg-[#fff6e4]/85 p-2.5">
+        <legend className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-400">Participants</legend>
+        <div className="max-h-44 space-y-1.5 overflow-auto rounded-xl border border-slate-300/20 bg-slate-900/30 p-2.5">
           {candidateUsers.map((user) => (
             <label
               key={user.id}
-              className="fantasy-list-item flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-700"
+              className="fantasy-list-item flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-200"
             >
               <input
                 type="checkbox"
                 checked={selectedUserIds.includes(user.id)}
                 onChange={() => toggleUser(user.id)}
-                className="h-4 w-4 rounded border-slate-300 accent-[#8b2f2b]"
+                className="h-4 w-4 rounded border-slate-300/60 accent-sky-400"
               />
               <span className="font-medium">{user.displayName}</span>
-              <span className="text-xs text-slate-500">@{user.username}</span>
+              <span className="text-xs text-slate-400">@{user.username}</span>
             </label>
           ))}
         </div>
       </fieldset>
 
-      {error ? <p className="text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="notice-danger">{error}</p> : null}
 
       <button
         type="submit"

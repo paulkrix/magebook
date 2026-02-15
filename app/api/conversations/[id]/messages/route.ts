@@ -77,6 +77,20 @@ export async function POST(request: NextRequest, context: Context) {
       return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
     }
 
+    const membership = await prisma.conversationParticipant.findUnique({
+      where: {
+        conversationId_userId: {
+          conversationId: context.params.id,
+          userId: auth.user.id
+        }
+      },
+      select: { userId: true }
+    });
+
+    if (!membership) {
+      return NextResponse.json({ error: "Only conversation participants can post messages." }, { status: 403 });
+    }
+
     const body = await request.json();
     const parsed = createMessageSchema.safeParse(body);
 

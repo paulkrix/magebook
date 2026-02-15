@@ -60,7 +60,7 @@ export function MessageComposer({ conversationId }: Props) {
         className="social-input min-h-[110px] resize-y"
         placeholder="Write your message..."
       />
-      {error ? <p className="rounded-xl bg-red-50 p-2.5 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="notice-danger">{error}</p> : null}
       <button
         type="submit"
         disabled={isSubmitting}

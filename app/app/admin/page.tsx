@@ -15,8 +15,8 @@ export default async function AdminPage() {
       <main className="mx-auto max-w-2xl space-y-4">
         <div>
           <p className="fantasy-kicker text-xs font-semibold uppercase tracking-wide">Admin</p>
-          <h1 className="mt-1 text-2xl font-semibold text-slate-900">User management</h1>
-          <p className="mt-1 text-sm text-slate-600">
+          <h1 className="mt-1 text-2xl font-semibold text-slate-100">User management</h1>
+          <p className="mt-1 text-sm text-slate-400">
             Create user accounts here. Only existing accounts can sign in.
           </p>
         </div>

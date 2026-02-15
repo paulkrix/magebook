@@ -5,6 +5,9 @@ import { SESSION_COOKIE_NAME } from "@/lib/constants";
 import { POST as loginPost } from "@/app/api/auth/login/route";
 import { POST as createConversationPost } from "@/app/api/conversations/route";
 import { PATCH as renameConversationPatch } from "@/app/api/conversations/[id]/route";
+import { POST as createMessagePost } from "@/app/api/conversations/[id]/messages/route";
+import { POST as inviteParticipantPost } from "@/app/api/conversations/[id]/participants/route";
+import { DELETE as removeParticipantDelete } from "@/app/api/conversations/[id]/participants/[userId]/route";
 import { POST as adminCreateUserPost } from "@/app/api/admin/users/route";
 
 type SeedUser = {
@@ -255,5 +258,194 @@ describe("API integration", () => {
     );
 
     expect(forbiddenRename.status).toBe(403);
+  });
+
+  it("only allows participants to post and supports invites", async () => {
+    const bobLogin = await loginPost(
+      new NextRequest("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          identifier: bob.username,
+          password: process.env.SHARED_PASSWORD
+        })
+      })
+    );
+
+    const bobCookie = bobLogin.headers.get("set-cookie");
+    const bobToken = bobCookie?.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`))?.[1] ?? "";
+
+    const createConversationResponse = await createConversationPost(
+      new NextRequest("http://localhost:3000/api/conversations", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${bobToken}`
+        },
+        body: JSON.stringify({
+          title: "Joinable Thread",
+          participantIds: [carol.id]
+        })
+      })
+    );
+
+    const createdPayload = (await createConversationResponse.json()) as { conversation?: { id: string } };
+    const conversationId = createdPayload.conversation?.id ?? "";
+    expect(conversationId).toBeTruthy();
+
+    const daveLogin = await loginPost(
+      new NextRequest("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          identifier: dave.username,
+          password: process.env.SHARED_PASSWORD
+        })
+      })
+    );
+
+    const daveCookie = daveLogin.headers.get("set-cookie");
+    const daveToken = daveCookie?.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`))?.[1] ?? "";
+
+    const forbiddenPostResponse = await createMessagePost(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/messages`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${daveToken}`
+        },
+        body: JSON.stringify({ body: "I am joining this conversation." })
+      }),
+      { params: { id: conversationId } }
+    );
+
+    expect(forbiddenPostResponse.status).toBe(403);
+
+    const inviteResponse = await inviteParticipantPost(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/participants`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${bobToken}`
+        },
+        body: JSON.stringify({ userId: dave.id })
+      }),
+      { params: { id: conversationId } }
+    );
+
+    expect(inviteResponse.status).toBe(201);
+
+    const inviteMessage = await prisma.message.findFirst({
+      where: { conversationId },
+      orderBy: { createdAt: "desc" },
+      select: { body: true }
+    });
+    expect(inviteMessage?.body).toBe("Bob added Dave to the conversation.");
+
+    const postMessageResponse = await createMessagePost(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/messages`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${daveToken}`
+        },
+        body: JSON.stringify({ body: "Thanks for the invite." })
+      }),
+      { params: { id: conversationId } }
+    );
+
+    expect(postMessageResponse.status).toBe(201);
+
+    const daveMembership = await prisma.conversationParticipant.findUnique({
+      where: {
+        conversationId_userId: {
+          conversationId,
+          userId: dave.id
+        }
+      },
+      select: { userId: true }
+    });
+
+    expect(daveMembership?.userId).toBe(dave.id);
+
+    const participantCount = await prisma.conversationParticipant.count({
+      where: { conversationId }
+    });
+    expect(participantCount).toBe(3);
+  });
+
+  it("allows admin to remove participants from a conversation", async () => {
+    const bobLogin = await loginPost(
+      new NextRequest("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          identifier: bob.username,
+          password: process.env.SHARED_PASSWORD
+        })
+      })
+    );
+    const bobToken = bobLogin.headers.get("set-cookie")?.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`))?.[1] ?? "";
+
+    const createConversationResponse = await createConversationPost(
+      new NextRequest("http://localhost:3000/api/conversations", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${bobToken}`
+        },
+        body: JSON.stringify({
+          title: "Admin Removal",
+          participantIds: [carol.id, dave.id]
+        })
+      })
+    );
+    const conversationId =
+      ((await createConversationResponse.json()) as { conversation?: { id: string } }).conversation?.id ?? "";
+    expect(conversationId).toBeTruthy();
+
+    const nonAdminRemoval = await removeParticipantDelete(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/participants/${dave.id}`, {
+        method: "DELETE",
+        headers: {
+          cookie: `${SESSION_COOKIE_NAME}=${bobToken}`
+        }
+      }),
+      { params: { id: conversationId, userId: dave.id } }
+    );
+    expect(nonAdminRemoval.status).toBe(403);
+
+    const aliceLogin = await loginPost(
+      new NextRequest("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          identifier: alice.username,
+          password: process.env.SHARED_PASSWORD
+        })
+      })
+    );
+    const aliceToken = aliceLogin.headers.get("set-cookie")?.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`))?.[1] ?? "";
+
+    const adminRemoval = await removeParticipantDelete(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/participants/${dave.id}`, {
+        method: "DELETE",
+        headers: {
+          cookie: `${SESSION_COOKIE_NAME}=${aliceToken}`
+        }
+      }),
+      { params: { id: conversationId, userId: dave.id } }
+    );
+    expect(adminRemoval.status).toBe(200);
+
+    const daveMembership = await prisma.conversationParticipant.findUnique({
+      where: {
+        conversationId_userId: {
+          conversationId,
+          userId: dave.id
+        }
+      }
+    });
+    expect(daveMembership).toBeNull();
   });
 });

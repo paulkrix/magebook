@@ -59,7 +59,7 @@ export function AdminCreateUserForm() {
   return (
     <form onSubmit={onSubmit} className="social-card space-y-4 p-5 sm:p-6">
       <div>
-        <label htmlFor="username" className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label htmlFor="username" className="mb-1.5 block text-sm font-medium text-slate-200">
           Username
         </label>
         <input
@@ -73,7 +73,7 @@ export function AdminCreateUserForm() {
       </div>
 
       <div>
-        <label htmlFor="displayName" className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label htmlFor="displayName" className="mb-1.5 block text-sm font-medium text-slate-200">
           Display name
         </label>
         <input
@@ -87,7 +87,7 @@ export function AdminCreateUserForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-200">
           Email (optional)
         </label>
         <input
@@ -100,10 +100,10 @@ export function AdminCreateUserForm() {
         />
       </div>
 
-      {error ? <p className="rounded-xl bg-red-50 p-2.5 text-sm text-red-700">{error}</p> : null}
-      {message ? <p className="rounded-xl bg-emerald-50 p-2.5 text-sm text-emerald-700">{message}</p> : null}
+      {error ? <p className="notice-danger">{error}</p> : null}
+      {message ? <p className="notice-success">{message}</p> : null}
       {createdUser ? (
-        <p className="rounded-xl bg-slate-50 p-2.5 text-sm text-slate-700">
+        <p className="notice-neutral">
           Created: <strong>{createdUser.displayName}</strong> (@{createdUser.username})
         </p>
       ) : null}

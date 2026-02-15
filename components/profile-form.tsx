@@ -86,10 +86,10 @@ export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
         <img
           src={profileImageUrl ?? DEFAULT_AVATAR_PATH}
           alt="Profile"
-          className="h-20 w-20 rounded-full border-2 border-white object-cover shadow-md"
+          className="h-20 w-20 rounded-full border-2 border-slate-200/40 object-cover shadow-md"
         />
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-slate-700" htmlFor="profileImage">
+          <label className="block text-sm font-medium text-slate-200" htmlFor="profileImage">
             Profile image
           </label>
           <input
@@ -104,12 +104,12 @@ export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
             }}
             className="social-input fantasy-file-input block cursor-pointer text-sm"
           />
-          <p className="text-xs text-slate-500">JPEG/PNG/WEBP/GIF only. Max size 2 MB.</p>
+          <p className="text-xs text-slate-400">JPEG/PNG/WEBP/GIF only. Max size 2 MB.</p>
         </div>
       </div>
 
       <div>
-        <label htmlFor="displayName" className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label htmlFor="displayName" className="mb-1.5 block text-sm font-medium text-slate-200">
           Display name
         </label>
         <input
@@ -121,8 +121,8 @@ export function ProfileForm({ initialDisplayName, initialImageUrl }: Props) {
         />
       </div>
 
-      {error ? <p className="rounded-xl bg-red-50 p-2.5 text-sm text-red-700">{error}</p> : null}
-      {message ? <p className="rounded-xl bg-emerald-50 p-2.5 text-sm text-emerald-700">{message}</p> : null}
+      {error ? <p className="notice-danger">{error}</p> : null}
+      {message ? <p className="notice-success">{message}</p> : null}
 
       <button
         type="submit"

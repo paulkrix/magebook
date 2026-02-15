@@ -40,7 +40,7 @@ export function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-700" htmlFor="identifier">
+        <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="identifier">
           Username or email
         </label>
         <input
@@ -55,7 +55,7 @@ export function LoginForm() {
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-700" htmlFor="password">
+        <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="password">
           Shared password
         </label>
         <input
@@ -69,7 +69,7 @@ export function LoginForm() {
         />
       </div>
 
-      {error ? <p className="rounded-xl bg-red-50 p-2.5 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="notice-danger">{error}</p> : null}
 
       <button
         type="submit"

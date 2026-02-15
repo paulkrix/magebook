@@ -35,6 +35,10 @@ export const createMessageSchema = z.object({
   body: z.string().trim().min(1).max(2000)
 });
 
+export const inviteParticipantSchema = z.object({
+  userId: z.string().trim().min(1)
+});
+
 export const adminCreateUserSchema = z.object({
   username: z
     .string()
