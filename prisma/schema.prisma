@@ -19,6 +19,8 @@ model User {
   displayName           String
   bio                   String?
   profileImageUrl       String?
+  followers             Int                       @default(0)
+  following             Int                       @default(0)
   role                  UserRole                  @default(USER)
   createdAt             DateTime                  @default(now())
   updatedAt             DateTime                  @updatedAt

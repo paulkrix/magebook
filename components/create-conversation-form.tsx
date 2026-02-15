@@ -82,7 +82,7 @@ export function CreateConversationForm({ users, currentUserId }: Props) {
         onClick={() => setIsMobileExpanded((previous) => !previous)}
         aria-expanded={isMobileExpanded}
         aria-controls="create-conversation-form"
-        className="social-button-primary w-full px-3 py-2.5 text-sm sm:hidden"
+        className="social-button-primary w-full px-3 py-2.5 text-sm lg:hidden"
       >
         {isMobileExpanded ? "Hide new conversation" : "Start new conversation"}
       </button>
@@ -90,14 +90,14 @@ export function CreateConversationForm({ users, currentUserId }: Props) {
       <form
         id="create-conversation-form"
         onSubmit={handleSubmit}
-        className={`social-card space-y-4 p-4 sm:p-5 ${isMobileExpanded ? "block" : "hidden"} sm:block`}
+        className={`social-card space-y-4 p-4 sm:p-5 ${isMobileExpanded ? "block" : "hidden"} lg:block`}
       >
         <h3 className="fantasy-card-title text-sm font-semibold uppercase tracking-wide">Create conversation</h3>
 
         <div>
           <label
             htmlFor="conversation-title"
-            className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-400"
+            className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[#9da1ad]"
           >
             Title
           </label>
@@ -113,21 +113,21 @@ export function CreateConversationForm({ users, currentUserId }: Props) {
         </div>
 
         <fieldset>
-          <legend className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-400">Participants</legend>
-          <div className="max-h-44 space-y-1.5 overflow-auto rounded-xl border border-slate-300/20 bg-slate-900/30 p-2.5">
+          <legend className="mb-1.5 text-xs font-medium uppercase tracking-wide text-[#9da1ad]">Participants</legend>
+          <div className="max-h-44 space-y-1.5 overflow-auto rounded-xl border border-[#30343d] bg-[#1a1d24] p-2.5">
             {candidateUsers.map((user) => (
               <label
                 key={user.id}
-                className="fantasy-list-item flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-200"
+                className="fantasy-list-item flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[#d5d8e0]"
               >
                 <input
                   type="checkbox"
                   checked={selectedUserIds.includes(user.id)}
                   onChange={() => toggleUser(user.id)}
-                  className="h-4 w-4 rounded border-slate-300/60 accent-sky-400"
+                  className="h-4 w-4 rounded border-[#4a4f59] accent-[#8b8f99]"
                 />
                 <span className="font-medium">{user.displayName}</span>
-                <span className="text-xs text-slate-400">@{user.username}</span>
+                <span className="text-xs text-[#878b96]">@{user.username}</span>
               </label>
             ))}
           </div>
@@ -138,7 +138,7 @@ export function CreateConversationForm({ users, currentUserId }: Props) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="social-button-primary w-full px-3 py-2.5 text-sm sm:w-auto"
+          className="social-button-primary w-full px-3 py-2.5 text-sm lg:w-auto"
         >
           {isSubmitting ? "Creating..." : "Start conversation"}
         </button>

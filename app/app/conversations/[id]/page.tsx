@@ -102,19 +102,22 @@ export default async function ConversationPage({ params }: Props) {
   const canRenameConversation = isParticipant;
   const canInviteParticipants = isParticipant && !adminView;
   const canRemoveParticipants = adminView;
+  const showComposer = !adminView && isParticipant;
 
   return (
     <AppShell user={user}>
-      <main className="space-y-4">
-        <Link href="/app" className="fantasy-back-link inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium shadow-sm transition">
-          Back to dashboard
-        </Link>
+      <main className={`space-y-4 ${showComposer ? "chat-page-bottom-pad" : ""}`}>
+        <section className="chat-subheader p-4 sm:p-5">
+          <div className="mb-3">
+            <Link href="/app" className="fantasy-back-link inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition">
+              Back to dashboard
+            </Link>
+          </div>
 
-        <section className="social-card p-4 sm:p-5">
           {canRenameConversation ? (
             <ConversationTitleEditor conversationId={conversation.id} initialTitle={conversation.title} />
           ) : (
-            <h1 className="text-xl font-semibold text-slate-100">{conversation.title ?? "Untitled conversation"}</h1>
+            <h1 className="text-xl font-semibold text-white">{conversation.title ?? "Untitled conversation"}</h1>
           )}
         </section>
 
@@ -126,33 +129,52 @@ export default async function ConversationPage({ params }: Props) {
           canRemoveParticipants={canRemoveParticipants}
         />
 
-        <section className="social-card p-4 sm:p-5">
+        <section className="chat-messages-shell p-4 sm:p-5">
           <h2 className="fantasy-card-title mb-3 text-sm font-semibold uppercase tracking-wide">Messages</h2>
-          <ul className="space-y-3.5">
+          <ul className="chat-message-list">
             {conversation.messages.length === 0 ? (
               <li className="text-sm text-slate-400">No messages yet.</li>
             ) : (
-              conversation.messages.map((message) => (
-                <li key={message.id} className="fantasy-link-card rounded-2xl p-3">
-                  <div className="mb-1 flex items-center gap-2">
-                    <img
-                      src={message.author.profileImageUrl ?? DEFAULT_AVATAR_PATH}
-                      alt={message.author.displayName}
-                      className="h-8 w-8 rounded-full border border-slate-200/35 object-cover shadow-sm"
-                    />
-                    <Link href={`/app/users/${message.author.username}`} className="text-sm font-semibold text-slate-100 hover:text-white">
-                      {message.author.displayName}
-                    </Link>
-                    <span className="text-xs text-slate-400">{formatSydneyDateTime(message.createdAt)}</span>
-                  </div>
-                  <p className="whitespace-pre-wrap text-sm text-slate-300">{message.body}</p>
-                </li>
-              ))
+              conversation.messages.map((message, index) => {
+                const outgoing = message.author.id === user.id;
+                const statusLabel = outgoing ? (index === conversation.messages.length - 1 ? "Seen" : "Sent") : "Delivered";
+
+                return (
+                  <li
+                    key={message.id}
+                    className={`chat-message-row ${outgoing ? "chat-message-row-outgoing" : "chat-message-row-incoming"}`}
+                  >
+                    <article className={`chat-bubble ${outgoing ? "chat-bubble-outgoing" : "chat-bubble-incoming"}`}>
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={message.author.profileImageUrl ?? DEFAULT_AVATAR_PATH}
+                          alt={message.author.displayName}
+                          className="h-6 w-6 rounded-full border border-[#363a44] object-cover"
+                        />
+                        <Link href={`/app/users/${message.author.username}`} className="chat-author hover:text-white">
+                          {message.author.displayName}
+                        </Link>
+                      </div>
+                      <p className="chat-body">{message.body}</p>
+                      <div className="chat-meta">
+                        <span>{formatSydneyDateTime(message.createdAt)}</span>
+                        <span>{statusLabel}</span>
+                      </div>
+                    </article>
+                  </li>
+                );
+              })
             )}
           </ul>
         </section>
 
-        {!adminView && isParticipant ? <MessageComposer conversationId={conversation.id} /> : null}
+        {showComposer ? (
+          <MessageComposer
+            conversationId={conversation.id}
+            currentUserDisplayName={user.displayName}
+            currentUserAvatarUrl={user.profileImageUrl}
+          />
+        ) : null}
         {!adminView && !isParticipant ? (
           <p className="text-sm text-slate-400">Only participants can post in this conversation.</p>
         ) : null}

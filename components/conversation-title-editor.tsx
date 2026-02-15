@@ -53,7 +53,7 @@ export function ConversationTitleEditor({ conversationId, initialTitle }: Props)
   if (!isEditing) {
     return (
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-xl font-semibold text-slate-100">{initialTitle ?? "Untitled conversation"}</h1>
+        <h1 className="text-xl font-semibold text-white">{initialTitle ?? "Untitled conversation"}</h1>
         <button
           type="button"
           onClick={() => setIsEditing(true)}
@@ -67,7 +67,7 @@ export function ConversationTitleEditor({ conversationId, initialTitle }: Props)
 
   return (
     <form onSubmit={onSubmit} className="space-y-2">
-      <label htmlFor="conversation-title-editor" className="text-xs font-medium uppercase tracking-wide text-slate-400">
+      <label htmlFor="conversation-title-editor" className="text-xs font-medium uppercase tracking-wide text-[#9da1ad]">
         Conversation title
       </label>
       <div className="flex flex-wrap items-center gap-2">

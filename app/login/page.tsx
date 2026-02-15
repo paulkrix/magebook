@@ -10,17 +10,17 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl items-center px-4 py-8 sm:px-6">
+    <main className="mx-auto flex min-h-screen w-full max-w-[920px] items-center px-3 py-8 sm:px-4">
       <div className="grid w-full gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <section className="social-card hidden p-8 lg:block lg:p-10">
           <p className="fantasy-pill mb-4 inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
             Community network
           </p>
           <h1 className="mb-4 text-4xl font-semibold leading-tight text-slate-100">
-            A social feed for your local circle.
+            Dark-mode chat for your local circle.
           </h1>
           <p className="social-muted max-w-lg text-base">
-            Share updates, run group conversations, and browse profile pages in one place.
+            Conversations, profiles, and media tiles in a single cinematic interface.
           </p>
 
           <div className="mt-8 grid grid-cols-3 gap-2">

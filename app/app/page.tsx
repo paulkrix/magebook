@@ -106,7 +106,7 @@ export default async function AppDashboardPage() {
           <div className="space-y-4">
             {!adminView ? <CreateConversationForm users={users} currentUserId={user.id} /> : null}
 
-            <details className="sm:hidden">
+            <details className="lg:hidden">
               <summary className="social-button-secondary w-full cursor-pointer rounded-full px-3 py-2.5 text-sm font-semibold">
                 People
               </summary>
@@ -134,7 +134,7 @@ export default async function AppDashboardPage() {
               </div>
             </details>
 
-            <div className="social-card hidden p-4 sm:block sm:p-5">
+            <div className="social-card hidden p-4 lg:block sm:p-5">
               <h2 className="fantasy-card-title mb-3 text-sm font-semibold uppercase tracking-wide">People</h2>
               <ul className="space-y-2.5">
                 {users.map((item) => (

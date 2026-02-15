@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { UserRole } from "@prisma/client";
 import { isUserAdmin } from "@/lib/auth";
-import { DEFAULT_AVATAR_PATH } from "@/lib/constants";
 import { LogoutButton } from "@/components/logout-button";
 
 type AppShellUser = {
@@ -23,56 +22,63 @@ export function AppShell({ user, children }: Props) {
   return (
     <div className="min-h-screen pb-8">
       <header className="fantasy-topbar sticky top-0 z-20">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-3 sm:gap-5">
-            <Link href="/app" className="flex items-center gap-2 text-base font-bold tracking-tight text-slate-100 sm:text-lg">
-              <span className="fantasy-crest inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold">
-                C
-              </span>
-              Community
+        <div className="social-page-wrap px-3 sm:px-4">
+          <div className="relative flex h-14 items-center justify-between">
+            <Link href="/app" className="social-icon-button" aria-label="Back to dashboard">
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+              </svg>
             </Link>
-            <nav className="hidden items-center gap-1 text-sm sm:flex">
-              <Link href="/app" className="fantasy-nav-link px-3 py-1.5 font-medium">
-                Dashboard
+
+            <p className="pointer-events-none absolute left-1/2 -translate-x-1/2 text-sm font-bold tracking-[0.07em] text-white sm:text-base">
+              COMMUNITY
+            </p>
+
+            <div className="flex items-center gap-2">
+              <Link href="/app/profile" className="social-icon-button" aria-label="Profile settings">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <path d="M3 6h18" />
+                  <path d="M7 12h10" />
+                  <path d="M10 18h4" />
+                </svg>
               </Link>
               <Link
-                href={`/app/users/${user.username}`}
-                className="fantasy-nav-link px-3 py-1.5 font-medium"
+                href={canManageUsers ? "/app/admin" : `/app/users/${user.username}`}
+                className="social-icon-button"
+                aria-label={canManageUsers ? "Admin tools" : "My profile"}
               >
-                My profile
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <circle cx="12" cy="8" r="3.5" />
+                  <path d="M5 20c1.5-3.2 4-5 7-5s5.5 1.8 7 5" />
+                </svg>
               </Link>
-              <Link
-                href="/app/profile"
-                className="fantasy-nav-link px-3 py-1.5 font-medium"
-              >
-                Edit profile
-              </Link>
-              {canManageUsers ? (
-                <Link
-                  href="/app/admin"
-                  className="fantasy-nav-link px-3 py-1.5 font-medium"
-                >
-                  Admin
-                </Link>
-              ) : null}
-            </nav>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link href={`/app/users/${user.username}`} className="inline-flex items-center gap-2">
-              <img
-                src={user.profileImageUrl ?? DEFAULT_AVATAR_PATH}
-                alt={user.displayName}
-                className="h-9 w-9 rounded-full border border-slate-300/40 object-cover shadow-sm"
-              />
-              <span className="hidden text-sm font-medium text-slate-200 sm:inline">{user.displayName}</span>
+          <nav className="flex items-center gap-1 overflow-x-auto pb-3 text-sm">
+            <Link href="/app" className="social-nav-link px-3 py-1.5 font-medium">
+              Dashboard
             </Link>
-            <LogoutButton />
-          </div>
+            <Link href={`/app/users/${user.username}`} className="social-nav-link px-3 py-1.5 font-medium">
+              Profile
+            </Link>
+            <Link href="/app/profile" className="social-nav-link px-3 py-1.5 font-medium">
+              Edit
+            </Link>
+            {canManageUsers ? (
+              <Link href="/app/admin" className="social-nav-link px-3 py-1.5 font-medium">
+                Admin
+              </Link>
+            ) : null}
+            <div className="ml-auto">
+              <LogoutButton compact />
+            </div>
+          </nav>
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 sm:py-6">{children}</div>
+      <div className="social-page-wrap w-full px-3 py-4 sm:px-4 sm:py-5">{children}</div>
     </div>
   );
 }

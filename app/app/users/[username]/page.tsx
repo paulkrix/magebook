@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { requirePageUser } from "@/lib/auth";
+import { isUserAdmin, requirePageUser } from "@/lib/auth";
 import { DEFAULT_AVATAR_PATH } from "@/lib/constants";
 import { formatSydneyDate } from "@/lib/date-time";
 import { AppShell } from "@/components/app-shell";
+import { AdminUserSocialCountsForm } from "@/components/admin-user-social-counts-form";
 
 type Props = {
   params: {
@@ -13,12 +14,12 @@ type Props = {
 };
 
 const tileGradients = [
-  "linear-gradient(170deg, rgba(67, 121, 188, 0.8), rgba(22, 45, 78, 0.95))",
-  "linear-gradient(170deg, rgba(81, 106, 182, 0.78), rgba(19, 33, 66, 0.94))",
-  "linear-gradient(170deg, rgba(46, 146, 177, 0.74), rgba(14, 42, 60, 0.93))",
-  "linear-gradient(170deg, rgba(84, 93, 172, 0.75), rgba(18, 29, 60, 0.92))",
-  "linear-gradient(170deg, rgba(47, 129, 190, 0.74), rgba(11, 34, 58, 0.92))",
-  "linear-gradient(170deg, rgba(69, 118, 170, 0.74), rgba(17, 35, 62, 0.92))"
+  "linear-gradient(170deg, rgba(121, 90, 54, 0.58), rgba(35, 36, 44, 0.92))",
+  "linear-gradient(170deg, rgba(77, 67, 56, 0.62), rgba(30, 31, 39, 0.92))",
+  "linear-gradient(170deg, rgba(95, 74, 48, 0.6), rgba(32, 33, 40, 0.94))",
+  "linear-gradient(170deg, rgba(64, 56, 49, 0.58), rgba(29, 31, 38, 0.93))",
+  "linear-gradient(170deg, rgba(111, 84, 56, 0.6), rgba(28, 30, 38, 0.94))",
+  "linear-gradient(170deg, rgba(84, 70, 56, 0.58), rgba(31, 32, 39, 0.93))"
 ];
 
 function formatCount(value: number): string {
@@ -38,7 +39,9 @@ export default async function UserProfilePage({ params }: Props) {
       username: true,
       displayName: true,
       bio: true,
-      profileImageUrl: true
+      profileImageUrl: true,
+      followers: true,
+      following: true
     }
   });
 
@@ -46,37 +49,8 @@ export default async function UserProfilePage({ params }: Props) {
     notFound();
   }
 
-  const memberships = await prisma.conversationParticipant.findMany({
-    where: { userId: profile.id },
-    select: { conversationId: true }
-  });
-
-  const conversationIds = memberships.map((entry) => entry.conversationId);
-
-  const [postCount, collaborators, activeAuthors, recentMessages] = await Promise.all([
+  const [postCount, recentMessages] = await Promise.all([
     prisma.message.count({ where: { authorId: profile.id } }),
-    conversationIds.length > 0
-      ? prisma.conversationParticipant.findMany({
-          where: {
-            conversationId: { in: conversationIds },
-            userId: { not: profile.id },
-            user: { role: "USER" }
-          },
-          distinct: ["userId"],
-          select: { userId: true }
-        })
-      : Promise.resolve([]),
-    conversationIds.length > 0
-      ? prisma.message.findMany({
-          where: {
-            conversationId: { in: conversationIds },
-            authorId: { not: profile.id },
-            author: { role: "USER" }
-          },
-          distinct: ["authorId"],
-          select: { authorId: true }
-        })
-      : Promise.resolve([]),
     prisma.message.findMany({
       where: { authorId: profile.id },
       orderBy: { createdAt: "desc" },
@@ -93,8 +67,9 @@ export default async function UserProfilePage({ params }: Props) {
   ]);
 
   const isOwnProfile = viewer.id === profile.id;
-  const followingCount = collaborators.length;
-  const followerCount = activeAuthors.length;
+  const viewerIsAdmin = isUserAdmin(viewer);
+  const followingCount = profile.following;
+  const followerCount = profile.followers;
   const tiles =
     recentMessages.length > 0
       ? recentMessages
@@ -155,6 +130,13 @@ export default async function UserProfilePage({ params }: Props) {
             </div>
           </div>
         </section>
+        {viewerIsAdmin ? (
+          <AdminUserSocialCountsForm
+            userId={profile.id}
+            initialFollowers={profile.followers}
+            initialFollowing={profile.following}
+          />
+        ) : null}
 
         <section className="social-card p-3 sm:p-4">
           <div className="mb-2 flex items-center justify-between gap-2 px-1">

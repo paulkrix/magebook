@@ -49,3 +49,8 @@ export const adminCreateUserSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(320).optional().or(z.literal("")),
   displayName: z.string().trim().min(1).max(80)
 });
+
+export const adminUserSocialCountsPatchSchema = z.object({
+  followers: z.number().int().min(0).max(100000000),
+  following: z.number().int().min(0).max(100000000)
+});
