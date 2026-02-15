@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isUserAdmin, requirePageUser } from "@/lib/auth";
 import { DEFAULT_AVATAR_PATH } from "@/lib/constants";
+import { formatSydneyDateTime } from "@/lib/date-time";
 import { AppShell } from "@/components/app-shell";
 import { ConversationTitleEditor } from "@/components/conversation-title-editor";
 import { MessageComposer } from "@/components/message-composer";
@@ -141,7 +142,7 @@ export default async function ConversationPage({ params }: Props) {
                     <Link href={`/app/users/${message.author.username}`} className="text-sm font-semibold text-slate-100 hover:text-white">
                       {message.author.displayName}
                     </Link>
-                    <span className="text-xs text-slate-400">{new Date(message.createdAt).toLocaleString()}</span>
+                    <span className="text-xs text-slate-400">{formatSydneyDateTime(message.createdAt)}</span>
                   </div>
                   <p className="whitespace-pre-wrap text-sm text-slate-300">{message.body}</p>
                 </li>

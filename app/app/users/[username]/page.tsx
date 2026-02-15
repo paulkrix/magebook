@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePageUser } from "@/lib/auth";
 import { DEFAULT_AVATAR_PATH } from "@/lib/constants";
+import { formatSydneyDate } from "@/lib/date-time";
 import { AppShell } from "@/components/app-shell";
 
 type Props = {
@@ -173,7 +174,7 @@ export default async function UserProfilePage({ params }: Props) {
                     <p className="profile-grid-title line-clamp-2">{message.conversation.title ?? "Untitled conversation"}</p>
                     <p className="profile-grid-body line-clamp-3">{message.body}</p>
                   </div>
-                  <p className="profile-grid-time">{new Date(message.createdAt).toLocaleDateString()}</p>
+                  <p className="profile-grid-time">{formatSydneyDate(message.createdAt)}</p>
                 </div>
               </article>
             ))}

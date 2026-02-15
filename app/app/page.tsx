@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { isUserAdmin, requirePageUser } from "@/lib/auth";
 import { DEFAULT_AVATAR_PATH } from "@/lib/constants";
+import { formatSydneyDateTime } from "@/lib/date-time";
 import { AppShell } from "@/components/app-shell";
 import { CreateConversationForm } from "@/components/create-conversation-form";
 
@@ -182,7 +183,7 @@ export default async function AppDashboardPage() {
                               ({unreadMessageCount} unread {unreadMessageCount === 1 ? "message" : "messages"})
                             </span>
                           ) : null}
-                          <span className="text-xs text-slate-400">{new Date(latestActivityAt).toLocaleString()}</span>
+                          <span className="text-xs text-slate-400">{formatSydneyDateTime(latestActivityAt)}</span>
                         </div>
                       </div>
                       <p className="mt-1 text-xs text-slate-400">Participants: {participantNames || "None"}</p>
