@@ -90,6 +90,31 @@ export async function POST(request: NextRequest, context: Context) {
           body: `${auth.user.displayName} added ${invitee.displayName} to the conversation.`
         }
       });
+
+      await tx.conversationParticipant.updateMany({
+        where: {
+          conversationId: context.params.id,
+          userId: {
+            not: auth.user.id
+          }
+        },
+        data: {
+          unreadMessageCount: {
+            increment: 1
+          }
+        }
+      });
+
+      await tx.conversationParticipant.updateMany({
+        where: {
+          conversationId: context.params.id,
+          userId: auth.user.id
+        },
+        data: {
+          unreadMessageCount: 0,
+          lastReadAt: new Date()
+        }
+      });
     });
 
     return NextResponse.json(

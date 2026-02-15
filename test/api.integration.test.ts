@@ -342,6 +342,18 @@ describe("API integration", () => {
     });
     expect(inviteMessage?.body).toBe("Bob added Dave to the conversation.");
 
+    const membershipsAfterInvite = await prisma.conversationParticipant.findMany({
+      where: { conversationId },
+      select: {
+        userId: true,
+        unreadMessageCount: true
+      }
+    });
+
+    expect(membershipsAfterInvite.find((entry) => entry.userId === bob.id)?.unreadMessageCount).toBe(0);
+    expect(membershipsAfterInvite.find((entry) => entry.userId === carol.id)?.unreadMessageCount).toBe(1);
+    expect(membershipsAfterInvite.find((entry) => entry.userId === dave.id)?.unreadMessageCount).toBe(1);
+
     const postMessageResponse = await createMessagePost(
       new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/messages`, {
         method: "POST",
@@ -363,10 +375,28 @@ describe("API integration", () => {
           userId: dave.id
         }
       },
-      select: { userId: true }
+      select: {
+        userId: true,
+        unreadMessageCount: true,
+        lastReadAt: true
+      }
     });
 
     expect(daveMembership?.userId).toBe(dave.id);
+    expect(daveMembership?.unreadMessageCount).toBe(0);
+    expect(daveMembership?.lastReadAt).toBeTruthy();
+
+    const membershipsAfterPost = await prisma.conversationParticipant.findMany({
+      where: { conversationId },
+      select: {
+        userId: true,
+        unreadMessageCount: true
+      }
+    });
+
+    expect(membershipsAfterPost.find((entry) => entry.userId === bob.id)?.unreadMessageCount).toBe(1);
+    expect(membershipsAfterPost.find((entry) => entry.userId === carol.id)?.unreadMessageCount).toBe(2);
+    expect(membershipsAfterPost.find((entry) => entry.userId === dave.id)?.unreadMessageCount).toBe(0);
 
     const participantCount = await prisma.conversationParticipant.count({
       where: { conversationId }

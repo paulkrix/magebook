@@ -83,6 +83,20 @@ export default async function ConversationPage({ params }: Props) {
   }
 
   const isParticipant = conversation.participants.some((entry) => entry.userId === user.id);
+
+  if (isParticipant) {
+    await prisma.conversationParticipant.updateMany({
+      where: {
+        conversationId: conversation.id,
+        userId: user.id
+      },
+      data: {
+        unreadMessageCount: 0,
+        lastReadAt: new Date()
+      }
+    });
+  }
+
   const canRenameConversation = isParticipant;
   const canInviteParticipants = isParticipant && !adminView;
   const canRemoveParticipants = adminView;

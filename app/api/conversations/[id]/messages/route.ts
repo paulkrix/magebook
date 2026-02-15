@@ -98,22 +98,51 @@ export async function POST(request: NextRequest, context: Context) {
       return NextResponse.json({ error: "Invalid message payload." }, { status: 400 });
     }
 
-    const message = await prisma.message.create({
-      data: {
-        conversationId: context.params.id,
-        authorId: auth.user.id,
-        body: parsed.data.body
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            displayName: true,
-            profileImageUrl: true
+    const message = await prisma.$transaction(async (tx) => {
+      const createdMessage = await tx.message.create({
+        data: {
+          conversationId: context.params.id,
+          authorId: auth.user.id,
+          body: parsed.data.body
+        },
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              profileImageUrl: true
+            }
           }
         }
-      }
+      });
+
+      await tx.conversationParticipant.updateMany({
+        where: {
+          conversationId: context.params.id,
+          userId: {
+            not: auth.user.id
+          }
+        },
+        data: {
+          unreadMessageCount: {
+            increment: 1
+          }
+        }
+      });
+
+      await tx.conversationParticipant.updateMany({
+        where: {
+          conversationId: context.params.id,
+          userId: auth.user.id
+        },
+        data: {
+          unreadMessageCount: 0,
+          lastReadAt: new Date()
+        }
+      });
+
+      return createdMessage;
     });
 
     return NextResponse.json({ message }, { status: 201 });

@@ -168,13 +168,22 @@ export default async function AppDashboardPage() {
                 const participantNames = conversation.participants.map((participant) => participant.user.displayName).join(", ");
                 const latestMessage = conversation.messages[0];
                 const latestActivityAt = latestMessage?.createdAt ?? conversation.createdAt;
+                const currentUserMembership = conversation.participants.find((participant) => participant.userId === user.id);
+                const unreadMessageCount = currentUserMembership?.unreadMessageCount ?? 0;
 
                 return (
                   <li key={conversation.id}>
                     <Link href={`/app/conversations/${conversation.id}`} className="fantasy-link-card block rounded-2xl p-3.5">
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-sm font-semibold text-slate-100">{conversation.title ?? "Untitled conversation"}</p>
-                        <span className="text-xs text-slate-400">{new Date(latestActivityAt).toLocaleString()}</span>
+                        <div className="flex items-center gap-2">
+                          {unreadMessageCount > 0 ? (
+                            <span className="fantasy-pill rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                              ({unreadMessageCount} unread {unreadMessageCount === 1 ? "message" : "messages"})
+                            </span>
+                          ) : null}
+                          <span className="text-xs text-slate-400">{new Date(latestActivityAt).toLocaleString()}</span>
+                        </div>
                       </div>
                       <p className="mt-1 text-xs text-slate-400">Participants: {participantNames || "None"}</p>
                       {latestMessage ? (
