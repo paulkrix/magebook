@@ -10,6 +10,8 @@ const RATE_LIMIT_WINDOW_MS = 60_000;
 const DEFAULT_RATE_LIMIT = 120;
 const AUTH_RATE_LIMIT = 20;
 const UPLOAD_RATE_LIMIT = 30;
+const GIPHY_SEARCH_RATE_LIMIT = 20;
+const GIPHY_IMPORT_RATE_LIMIT = 10;
 const rateLimitStore = new Map<string, RateLimitRecord>();
 
 function isPublicApiRoute(pathname: string): boolean {
@@ -20,8 +22,14 @@ function getRateLimit(pathname: string): number {
   if (pathname === "/api/auth/login") {
     return AUTH_RATE_LIMIT;
   }
-  if (pathname === "/api/me/profile-image") {
+  if (pathname === "/api/me/profile-image" || pathname === "/api/media/upload") {
     return UPLOAD_RATE_LIMIT;
+  }
+  if (pathname === "/api/media/giphy/search") {
+    return GIPHY_SEARCH_RATE_LIMIT;
+  }
+  if (pathname === "/api/media/giphy/import") {
+    return GIPHY_IMPORT_RATE_LIMIT;
   }
 
   return DEFAULT_RATE_LIMIT;

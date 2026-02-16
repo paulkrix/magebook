@@ -12,6 +12,11 @@ enum UserRole {
   ADMIN
 }
 
+enum MessageType {
+  TEXT
+  MEDIA
+}
+
 model User {
   id                    String                    @id @default(cuid())
   username              String                    @unique
@@ -28,6 +33,7 @@ model User {
   participantLinks      ConversationParticipant[]
   startedConversations  Conversation[]            @relation("ConversationCreatedBy")
   messages              Message[]
+  uploadedMedia         Media[]
 }
 
 model Session {
@@ -72,10 +78,33 @@ model Message {
   id             String       @id @default(cuid())
   conversationId String
   authorId       String
-  body           String
+  type           MessageType  @default(TEXT)
+  body           String?
+  mediaId        String?
+  contentType    String?
+  mediaWidth     Int?
+  mediaHeight    Int?
   createdAt      DateTime     @default(now())
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   author         User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  media          Media?       @relation(fields: [mediaId], references: [id], onDelete: SetNull)
 
   @@index([conversationId, createdAt])
+  @@index([mediaId])
+}
+
+model Media {
+  id           String    @id @default(cuid())
+  uploaderId   String
+  filename     String    @unique
+  originalName String?
+  contentType  String
+  sizeBytes    Int
+  width        Int?
+  height       Int?
+  createdAt    DateTime  @default(now())
+  uploader     User      @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  messages     Message[]
+
+  @@index([uploaderId, createdAt])
 }

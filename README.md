@@ -6,6 +6,7 @@ This project is refactored for a low-cost single-server deployment. It runs on o
 - `caddy`: reverse proxy with automatic HTTPS via Let's Encrypt
 
 Profile image uploads are stored on local disk in Docker volumes and served by the app at `/uploads/profile-images/<filename>`.
+Chat media uploads (images/GIFs) are stored in the same volume and served by authenticated API endpoints.
 
 ## Runtime Architecture
 - No AWS ECS/Fargate, RDS, S3, or load balancer dependencies
@@ -29,6 +30,12 @@ Required keys:
 - `SESSION_SECRET`
 - `ADMIN_IDENTIFIERS` (comma-separated usernames/emails promoted to `ADMIN` role during seed)
 - `SEED_USERS` (users created/updated by `npm run db:seed`)
+- `UPLOAD_BASE_DIR` (default `/data/uploads`)
+- `MAX_PROFILE_IMAGE_BYTES` (default `2097152`)
+- `MAX_CHAT_MEDIA_BYTES` (default `20971520`)
+- `GIPHY_API_KEY` (optional beta key; enables GIF search/import)
+- `GIPHY_SEARCH_LIMIT` (default `12`, max `25`)
+- `GIPHY_SEARCH_CACHE_TTL_MS` (default `180000`)
 
 ## Authentication Model
 - Only existing users can sign in.
@@ -100,7 +107,7 @@ docker compose logs -f web
 ### 5. Backups
 Enable **automatic Lightsail snapshots**. This protects:
 - PostgreSQL data (`postgres_data` volume)
-- Uploaded profile images (`uploads_data` volume)
+- Uploaded profile/chat media (`uploads_data` volume)
 - Caddy TLS state (`caddy_data` volume)
 
 ## Local Operations
@@ -116,6 +123,7 @@ docker compose down
 - Automatic migration on boot (`prisma migrate deploy`)
 - API health endpoint (`/api/health`) for container health checks
 - Basic IP-based API rate limiting middleware
-- File upload type/size checks (default max: 2 MB)
+- File upload type/size checks (profile image default: 2 MB, chat media default: 20 MB)
+- Debounced and cached GIPHY search to reduce external API calls
 - Graceful shutdown signal handling in container startup script
 - Structured logging to stdout/stderr for Docker log collection

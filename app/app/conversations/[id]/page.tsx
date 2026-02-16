@@ -9,6 +9,7 @@ import { ConversationAutoScroll } from "@/components/conversation-auto-scroll";
 import { ConversationTitleEditor } from "@/components/conversation-title-editor";
 import { MessageComposer } from "@/components/message-composer";
 import { ConversationParticipantsPanel } from "@/components/conversation-participants-panel";
+import { ChatMediaImage } from "@/components/chat-media-image";
 
 type Props = {
   params: {
@@ -155,7 +156,23 @@ export default async function ConversationPage({ params }: Props) {
                           {message.author.displayName}
                         </Link>
                       </div>
-                      <p className="chat-body">{message.body}</p>
+                      {message.type === "MEDIA" ? (
+                        <>
+                          {message.mediaId ? (
+                            <ChatMediaImage
+                              mediaId={message.mediaId}
+                              caption={message.body}
+                              width={message.mediaWidth}
+                              height={message.mediaHeight}
+                            />
+                          ) : (
+                            <p className="chat-media-fallback">Media unavailable.</p>
+                          )}
+                          {message.body ? <p className="chat-body">{message.body}</p> : null}
+                        </>
+                      ) : (
+                        <p className="chat-body">{message.body ?? ""}</p>
+                      )}
                       <div className="chat-meta">
                         <span>{formatSydneyDateTime(message.createdAt)}</span>
                         <span>{statusLabel}</span>

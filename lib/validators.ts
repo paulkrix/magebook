@@ -32,9 +32,21 @@ export const renameConversationSchema = z.object({
   title: z.string().trim().min(1).max(120)
 });
 
-export const createMessageSchema = z.object({
+const messageTextSchema = z.object({
+  type: z.literal("text").optional(),
   body: z.string().trim().min(1).max(2000)
 });
+
+const messageMediaSchema = z.object({
+  type: z.literal("media"),
+  mediaId: z.string().trim().min(1),
+  contentType: z.enum(["image/jpeg", "image/png", "image/webp", "image/gif"]),
+  width: z.number().int().min(1).max(20_000).optional(),
+  height: z.number().int().min(1).max(20_000).optional(),
+  caption: z.string().trim().max(2000).optional()
+});
+
+export const createMessageSchema = z.union([messageTextSchema, messageMediaSchema]);
 
 export const inviteParticipantSchema = z.object({
   userId: z.string().trim().min(1)

@@ -145,21 +145,26 @@ export default async function UserProfilePage({ params }: Props) {
           </div>
 
           <div className="profile-grid">
-            {tiles.map((message, index) => (
-              <article
-                key={message.id}
-                className="profile-grid-item"
-                style={{ backgroundImage: tileGradients[index % tileGradients.length] }}
-              >
-                <div className="profile-grid-content">
-                  <div>
-                    <p className="profile-grid-title line-clamp-2">{message.conversation.title ?? "Untitled conversation"}</p>
-                    <p className="profile-grid-body line-clamp-3">{message.body}</p>
+            {tiles.map((message, index) => {
+              const tileBody =
+                "type" in message && message.type === "MEDIA" ? message.body?.trim() || "Shared media" : message.body ?? "";
+
+              return (
+                <article
+                  key={message.id}
+                  className="profile-grid-item"
+                  style={{ backgroundImage: tileGradients[index % tileGradients.length] }}
+                >
+                  <div className="profile-grid-content">
+                    <div>
+                      <p className="profile-grid-title line-clamp-2">{message.conversation.title ?? "Untitled conversation"}</p>
+                      <p className="profile-grid-body line-clamp-3">{tileBody}</p>
+                    </div>
+                    <p className="profile-grid-time">{formatSydneyDate(message.createdAt)}</p>
                   </div>
-                  <p className="profile-grid-time">{formatSydneyDate(message.createdAt)}</p>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </section>
       </main>

@@ -98,13 +98,79 @@ export async function POST(request: NextRequest, context: Context) {
       return NextResponse.json({ error: "Invalid message payload." }, { status: 400 });
     }
 
+    const payload = parsed.data;
+
+    const createDataBase = {
+      conversationId: context.params.id,
+      authorId: auth.user.id
+    };
+
+    let messageData:
+      | (typeof createDataBase & {
+          type: "TEXT";
+          body: string;
+          mediaId: null;
+          contentType: null;
+          mediaWidth: null;
+          mediaHeight: null;
+        })
+      | (typeof createDataBase & {
+          type: "MEDIA";
+          body: string | null;
+          mediaId: string;
+          contentType: string;
+          mediaWidth: number | null;
+          mediaHeight: number | null;
+        });
+
+    if (payload.type === "media") {
+      const mediaToAttach = await prisma.media.findUnique({
+        where: { id: payload.mediaId },
+        select: {
+          id: true,
+          uploaderId: true,
+          contentType: true,
+          width: true,
+          height: true
+        }
+      });
+
+      if (!mediaToAttach) {
+        return NextResponse.json({ error: "Selected media was not found." }, { status: 404 });
+      }
+
+      if (mediaToAttach.uploaderId !== auth.user.id) {
+        return NextResponse.json({ error: "You can only send media you uploaded." }, { status: 403 });
+      }
+
+      if (payload.contentType !== mediaToAttach.contentType) {
+        return NextResponse.json({ error: "Media metadata is invalid." }, { status: 400 });
+      }
+
+      messageData = {
+        ...createDataBase,
+        type: "MEDIA",
+        body: payload.caption?.trim() || null,
+        mediaId: mediaToAttach.id,
+        contentType: mediaToAttach.contentType,
+        mediaWidth: mediaToAttach.width ?? null,
+        mediaHeight: mediaToAttach.height ?? null
+      };
+    } else {
+      messageData = {
+        ...createDataBase,
+        type: "TEXT",
+        body: payload.body,
+        mediaId: null,
+        contentType: null,
+        mediaWidth: null,
+        mediaHeight: null
+      };
+    }
+
     const message = await prisma.$transaction(async (tx) => {
       const createdMessage = await tx.message.create({
-        data: {
-          conversationId: context.params.id,
-          authorId: auth.user.id,
-          body: parsed.data.body
-        },
+        data: messageData,
         include: {
           author: {
             select: {

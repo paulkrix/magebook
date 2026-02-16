@@ -171,6 +171,11 @@ export default async function AppDashboardPage() {
                 const latestActivityAt = latestMessage?.createdAt ?? conversation.createdAt;
                 const currentUserMembership = conversation.participants.find((participant) => participant.userId === user.id);
                 const unreadMessageCount = currentUserMembership?.unreadMessageCount ?? 0;
+                const latestMessagePreview = latestMessage
+                  ? latestMessage.type === "MEDIA"
+                    ? latestMessage.body?.trim() || "Shared media"
+                    : latestMessage.body ?? ""
+                  : "";
 
                 return (
                   <li key={conversation.id}>
@@ -192,7 +197,7 @@ export default async function AppDashboardPage() {
                           <Link href={`/app/users/${latestMessage.author.username}`} className="font-semibold text-slate-100 hover:text-white">
                             {latestMessage.author.displayName}:
                           </Link>{" "}
-                          {latestMessage.body}
+                          {latestMessagePreview}
                         </p>
                       ) : (
                         <p className="mt-2 text-sm text-slate-400">No messages yet.</p>
