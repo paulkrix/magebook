@@ -48,6 +48,10 @@ const messageMediaSchema = z.object({
 
 export const createMessageSchema = z.union([messageTextSchema, messageMediaSchema]);
 
+export const upsertMessageReactionSchema = z.object({
+  emoji: z.string().trim().min(1).max(16)
+});
+
 export const inviteParticipantSchema = z.object({
   userId: z.string().trim().min(1)
 });

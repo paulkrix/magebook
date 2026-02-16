@@ -41,6 +41,18 @@ export async function GET(request: NextRequest, context: Context) {
                 displayName: true,
                 profileImageUrl: true
               }
+            },
+            reactions: {
+              orderBy: [{ emoji: "asc" }, { createdAt: "asc" }],
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    username: true,
+                    displayName: true
+                  }
+                }
+              }
             }
           }
         }
@@ -178,6 +190,18 @@ export async function POST(request: NextRequest, context: Context) {
               username: true,
               displayName: true,
               profileImageUrl: true
+            }
+          },
+          reactions: {
+            orderBy: [{ emoji: "asc" }, { createdAt: "asc" }],
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  displayName: true
+                }
+              }
             }
           }
         }

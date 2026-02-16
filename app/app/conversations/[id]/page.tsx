@@ -10,6 +10,7 @@ import { ConversationTitleEditor } from "@/components/conversation-title-editor"
 import { MessageComposer } from "@/components/message-composer";
 import { ConversationParticipantsPanel } from "@/components/conversation-participants-panel";
 import { ChatMediaImage } from "@/components/chat-media-image";
+import { MessageReactions } from "@/components/message-reactions";
 
 type Props = {
   params: {
@@ -64,6 +65,18 @@ export default async function ConversationPage({ params }: Props) {
                 username: true,
                 displayName: true,
                 profileImageUrl: true
+              }
+            },
+            reactions: {
+              orderBy: [{ emoji: "asc" }, { createdAt: "asc" }],
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    username: true,
+                    displayName: true
+                  }
+                }
               }
             }
           }
@@ -177,6 +190,13 @@ export default async function ConversationPage({ params }: Props) {
                         <span>{formatSydneyDateTime(message.createdAt)}</span>
                         <span>{statusLabel}</span>
                       </div>
+                      <MessageReactions
+                        conversationId={conversation.id}
+                        messageId={message.id}
+                        currentUserId={user.id}
+                        canReact={showComposer}
+                        initialReactions={message.reactions}
+                      />
                     </article>
                   </li>
                 );

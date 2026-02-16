@@ -536,6 +536,124 @@ a {
   gap: 0.45rem;
 }
 
+.chat-reactions-wrap {
+  margin-top: 0.5rem;
+}
+
+.chat-reactions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.chat-reaction-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 9999px;
+  border: 1px solid #3d4350;
+  background: #262b35;
+  color: #eff0f5;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.chat-reaction-chip-active {
+  border-color: #5d667a;
+  background: #303848;
+}
+
+.chat-reaction-count {
+  color: #d4d8e3;
+  font-size: 0.72rem;
+}
+
+.chat-reaction-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  border: 1px dashed #495061;
+  background: #202631;
+  color: #dce0ea;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.chat-reaction-picker {
+  margin-top: 0.4rem;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0.3rem;
+}
+
+.chat-reaction-emoji {
+  border-radius: 0.6rem;
+  border: 1px solid #394050;
+  background: #242a35;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.35rem 0.1rem;
+}
+
+.chat-reaction-custom {
+  margin-top: 0.35rem;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.chat-reaction-input {
+  flex: 1;
+  border-radius: 0.55rem;
+  border: 1px solid #394050;
+  background: #1e2430;
+  color: #edf0f7;
+  font-size: 0.79rem;
+  padding: 0.32rem 0.48rem;
+}
+
+.chat-reaction-custom-submit {
+  border-radius: 0.55rem;
+  border: 1px solid #434a5b;
+  background: #293140;
+  color: #ecf0f8;
+  font-size: 0.77rem;
+  padding: 0.28rem 0.58rem;
+}
+
+.chat-reaction-details {
+  margin-top: 0.35rem;
+  border: 1px solid #363d4c;
+  border-radius: 0.65rem;
+  background: #1b2029;
+  padding: 0.45rem 0.55rem;
+}
+
+.chat-reaction-details-title {
+  margin: 0;
+  color: #c8cdd9;
+  font-size: 0.74rem;
+}
+
+.chat-reaction-user-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1rem;
+}
+
+.chat-reaction-user-item {
+  color: #ecedf3;
+  font-size: 0.79rem;
+}
+
+.chat-reaction-error {
+  margin-top: 0.35rem;
+  color: #f1b8b8;
+  font-size: 0.78rem;
+}
+
 .chat-page-bottom-pad {
   padding-bottom: 6.9rem;
 }
@@ -805,5 +923,9 @@ a {
 
   .chat-giphy-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chat-reaction-picker {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }

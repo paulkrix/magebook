@@ -33,6 +33,7 @@ model User {
   participantLinks      ConversationParticipant[]
   startedConversations  Conversation[]            @relation("ConversationCreatedBy")
   messages              Message[]
+  messageReactions      MessageReaction[]
   uploadedMedia         Media[]
 }
 
@@ -88,9 +89,25 @@ model Message {
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   author         User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   media          Media?       @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  reactions      MessageReaction[]
 
   @@index([conversationId, createdAt])
   @@index([mediaId])
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([messageId, createdAt])
+  @@index([userId])
 }
 
 model Media {

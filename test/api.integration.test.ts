@@ -6,6 +6,7 @@ import { POST as loginPost } from "@/app/api/auth/login/route";
 import { POST as createConversationPost } from "@/app/api/conversations/route";
 import { PATCH as renameConversationPatch } from "@/app/api/conversations/[id]/route";
 import { POST as createMessagePost } from "@/app/api/conversations/[id]/messages/route";
+import { PUT as upsertReactionPut } from "@/app/api/conversations/[id]/messages/[messageId]/reactions/route";
 import { POST as inviteParticipantPost } from "@/app/api/conversations/[id]/participants/route";
 import { DELETE as removeParticipantDelete } from "@/app/api/conversations/[id]/participants/[userId]/route";
 import { POST as adminCreateUserPost } from "@/app/api/admin/users/route";
@@ -25,6 +26,7 @@ describe("API integration", () => {
     process.env.SHARED_PASSWORD = process.env.SHARED_PASSWORD ?? "community-password";
     process.env.SESSION_SECRET = process.env.SESSION_SECRET ?? "test-session-secret";
 
+    await prisma.messageReaction.deleteMany();
     await prisma.message.deleteMany();
     await prisma.conversationParticipant.deleteMany();
     await prisma.conversation.deleteMany();
@@ -86,6 +88,7 @@ describe("API integration", () => {
 
   afterAll(async () => {
     await prisma.session.deleteMany();
+    await prisma.messageReaction.deleteMany();
     await prisma.message.deleteMany();
     await prisma.conversationParticipant.deleteMany();
     await prisma.conversation.deleteMany();
@@ -477,5 +480,155 @@ describe("API integration", () => {
       }
     });
     expect(daveMembership).toBeNull();
+  });
+
+  it("allows participants to react, groups counts, and replaces previous reaction", async () => {
+    const bobLogin = await loginPost(
+      new NextRequest("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          identifier: bob.username,
+          password: process.env.SHARED_PASSWORD
+        })
+      })
+    );
+    const bobToken = bobLogin.headers.get("set-cookie")?.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`))?.[1] ?? "";
+
+    const carolLogin = await loginPost(
+      new NextRequest("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          identifier: carol.username,
+          password: process.env.SHARED_PASSWORD
+        })
+      })
+    );
+    const carolToken = carolLogin.headers.get("set-cookie")?.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`))?.[1] ?? "";
+
+    const daveLogin = await loginPost(
+      new NextRequest("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          identifier: dave.username,
+          password: process.env.SHARED_PASSWORD
+        })
+      })
+    );
+    const daveToken = daveLogin.headers.get("set-cookie")?.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`))?.[1] ?? "";
+
+    const createConversationResponse = await createConversationPost(
+      new NextRequest("http://localhost:3000/api/conversations", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${bobToken}`
+        },
+        body: JSON.stringify({
+          title: "Reactions",
+          participantIds: [carol.id]
+        })
+      })
+    );
+    const conversationId =
+      ((await createConversationResponse.json()) as { conversation?: { id: string } }).conversation?.id ?? "";
+    expect(conversationId).toBeTruthy();
+
+    const createMessageResponse = await createMessagePost(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/messages`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${bobToken}`
+        },
+        body: JSON.stringify({
+          body: "React to this."
+        })
+      }),
+      { params: { id: conversationId } }
+    );
+    expect(createMessageResponse.status).toBe(201);
+    const messageId = ((await createMessageResponse.json()) as { message?: { id: string } }).message?.id ?? "";
+    expect(messageId).toBeTruthy();
+
+    const daveReaction = await upsertReactionPut(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/messages/${messageId}/reactions`, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${daveToken}`
+        },
+        body: JSON.stringify({
+          emoji: "👍"
+        })
+      }),
+      { params: { id: conversationId, messageId } }
+    );
+    expect(daveReaction.status).toBe(403);
+
+    const bobReaction = await upsertReactionPut(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/messages/${messageId}/reactions`, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${bobToken}`
+        },
+        body: JSON.stringify({
+          emoji: "👍"
+        })
+      }),
+      { params: { id: conversationId, messageId } }
+    );
+    expect(bobReaction.status).toBe(200);
+
+    const carolReaction = await upsertReactionPut(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/messages/${messageId}/reactions`, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${carolToken}`
+        },
+        body: JSON.stringify({
+          emoji: "👍"
+        })
+      }),
+      { params: { id: conversationId, messageId } }
+    );
+    expect(carolReaction.status).toBe(200);
+    const groupedPayload = (await carolReaction.json()) as { reactions?: Array<{ emoji: string }> };
+    expect(groupedPayload.reactions?.filter((entry) => entry.emoji === "👍").length).toBe(2);
+
+    const bobReplaceReaction = await upsertReactionPut(
+      new NextRequest(`http://localhost:3000/api/conversations/${conversationId}/messages/${messageId}/reactions`, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+          cookie: `${SESSION_COOKIE_NAME}=${bobToken}`
+        },
+        body: JSON.stringify({
+          emoji: "🔥"
+        })
+      }),
+      { params: { id: conversationId, messageId } }
+    );
+    expect(bobReplaceReaction.status).toBe(200);
+    const replacedPayload = (await bobReplaceReaction.json()) as { reactions?: Array<{ emoji: string }> };
+    expect(replacedPayload.reactions?.filter((entry) => entry.emoji === "👍").length).toBe(1);
+    expect(replacedPayload.reactions?.filter((entry) => entry.emoji === "🔥").length).toBe(1);
+
+    const bobReactionRecord = await prisma.messageReaction.findUnique({
+      where: {
+        messageId_userId: {
+          messageId,
+          userId: bob.id
+        }
+      },
+      select: {
+        emoji: true
+      }
+    });
+    expect(bobReactionRecord?.emoji).toBe("🔥");
   });
 });
